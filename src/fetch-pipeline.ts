@@ -119,7 +119,7 @@ export function installFetchPipeline(): void {
 	state.installed = true;
 }
 
-export function registerFetchMiddleware(registration: FetchMiddlewareRegistration): void {
+export function registerFetchMiddleware(registration: FetchMiddlewareRegistration): () => void {
 	const state = ensureFetchPipeline();
 	const existingIndex = state.middlewares.findIndex((m) => m.name === registration.name);
 	if (existingIndex >= 0) {
@@ -128,4 +128,8 @@ export function registerFetchMiddleware(registration: FetchMiddlewareRegistratio
 		state.middlewares.push(registration);
 	}
 	installFetchPipeline();
+	return () => {
+		const index = state.middlewares.indexOf(registration);
+		if (index >= 0) state.middlewares.splice(index, 1);
+	};
 }
